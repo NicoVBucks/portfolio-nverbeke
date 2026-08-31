@@ -1,0 +1,1114 @@
+/*
+Theme Name: Portfolio Nicolas Verbeke
+Theme URI: https://github.com/NicoVBucks/portfolio-nverbeke
+Author: Nicolas Verbeke
+Author URI: https://github.com/NicoVBucks
+Description: Theme WordPress sur-mesure ecrit en PHP natif pour un portfolio de developpeur. Aucune extension, aucun constructeur de page, aucun JavaScript.
+Version: 1.0.0
+Requires at least: 6.0
+Requires PHP: 7.4
+License: GNU General Public License v2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: nverbeke
+Tags: portfolio, custom-post-type, accessibility-ready
+*/
+
+/* ==========================================================================
+   1. Polices auto-hebergees (subset latin, couvre le francais)
+   ========================================================================== */
+
+@font-face {
+	font-family: 'Fraunces';
+	src: url('assets/fonts/fraunces-variable-latin.woff2') format('woff2');
+	font-weight: 400 700;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'IBM Plex Mono';
+	src: url('assets/fonts/ibm-plex-mono-400-latin.woff2') format('woff2');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'IBM Plex Mono';
+	src: url('assets/fonts/ibm-plex-mono-500-latin.woff2') format('woff2');
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}
+
+/* ==========================================================================
+   2. Variables
+   ========================================================================== */
+
+:root {
+	/* Encre sur papier. Une seule couleur d'accent, reservee aux liens et au focus. */
+	--papier: #f2efe9;
+	--papier-alt: #e9e5dc;
+	--encre: #1b1a17;          /* 15.2:1 sur papier */
+	--encre-doux: #57534a;     /*  6.7:1 sur papier */
+	--filet: #cfc8ba;
+	--decor: #8a8071;          /*  3.4:1 sur papier : minimum WCAG pour du grand texte */
+	--accent: #b4381f;         /*  5.2:1 sur papier */
+	--accent-inverse: #e8734f; /*  5.8:1 sur encre  */
+
+	--serif: 'Fraunces', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+	--mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+
+	--wrap: 74rem;
+	--gouttiere: clamp(1.25rem, 5vw, 3.5rem);
+}
+
+/* ==========================================================================
+   3. Reinitialisation minimale
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	scroll-behavior: smooth;
+	-webkit-text-size-adjust: 100%;
+}
+
+body {
+	margin: 0;
+	background: var(--papier);
+	color: var(--encre);
+	font-family: var(--serif);
+	font-optical-sizing: auto;
+	font-size: 1.0625rem;
+	line-height: 1.7;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+}
+
+h1,
+h2,
+h3,
+h4 {
+	font-weight: 600;
+	letter-spacing: -0.015em;
+	text-wrap: balance;
+}
+
+a {
+	color: var(--accent);
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.18em;
+}
+
+a:hover {
+	text-decoration-thickness: 2px;
+}
+
+/* Le focus visible fait partie de l'identite du site : il est assume, pas efface. */
+:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 3px;
+}
+
+::selection {
+	background: var(--accent);
+	color: var(--papier);
+}
+
+/* ==========================================================================
+   4. Utilitaires
+   ========================================================================== */
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+.skip {
+	position: absolute;
+	left: -9999px;
+}
+
+.skip:focus {
+	position: fixed;
+	top: 1rem;
+	left: 1rem;
+	z-index: 100;
+	padding: 0.75rem 1.25rem;
+	background: var(--encre);
+	color: var(--papier);
+	font-family: var(--mono);
+	font-size: 0.8125rem;
+	text-decoration: none;
+}
+
+.wrap {
+	width: 100%;
+	max-width: var(--wrap);
+	margin-inline: auto;
+	padding-inline: var(--gouttiere);
+}
+
+.wrap--etroit {
+	max-width: 48rem;
+}
+
+.section {
+	padding-block: clamp(3.5rem, 9vw, 7rem);
+	border-top: 1px solid var(--filet);
+	scroll-margin-top: 1.5rem;
+}
+
+.section--alt {
+	background: var(--papier-alt);
+}
+
+/* Intitule de section : mono, capitales, souligne d'un filet pleine largeur. */
+.etiquette {
+	margin: 0 0 clamp(2rem, 4vw, 3rem);
+	padding-bottom: 0.7rem;
+	border-bottom: 1px solid var(--filet);
+	color: var(--encre-doux);
+	font-family: var(--mono);
+	font-size: 0.75rem;
+	font-weight: 500;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+}
+
+.section__chapo {
+	max-width: 54ch;
+	margin: 0 0 clamp(2rem, 4vw, 3rem);
+	color: var(--encre-doux);
+}
+
+.vide {
+	margin: 0;
+	padding: clamp(2rem, 5vw, 3rem);
+	border: 1px dashed var(--filet);
+	color: var(--encre-doux);
+	font-family: var(--mono);
+	font-size: 0.875rem;
+	text-align: center;
+}
+
+.lien-ext::after {
+	content: ' \2197';
+}
+
+/* ==========================================================================
+   5. En-tete
+   ========================================================================== */
+
+.entete {
+	border-bottom: 1px solid var(--filet);
+}
+
+.entete__inner {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem 2rem;
+	align-items: baseline;
+	justify-content: space-between;
+	padding-block: 1.1rem;
+}
+
+.entete__nom {
+	margin: 0;
+	font-family: var(--mono);
+	font-size: 0.8125rem;
+	font-weight: 500;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+}
+
+.entete__nom a,
+.nav__liste a {
+	color: inherit;
+	text-decoration: none;
+}
+
+/* Quatre libelles courts : ils passent a la ligne sur mobile.
+   Pas de menu deroulant, donc pas de JavaScript. */
+.nav__liste {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem 1.5rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	font-family: var(--mono);
+	font-size: 0.75rem;
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
+}
+
+.nav__liste a {
+	color: var(--encre-doux);
+}
+
+.nav__liste a:hover,
+.nav__liste .current-menu-item > a {
+	color: var(--encre);
+	text-decoration: underline;
+	text-underline-offset: 0.35em;
+}
+
+/* ==========================================================================
+   6. Hero
+   ========================================================================== */
+
+.hero {
+	padding-block: clamp(3rem, 10vw, 7.5rem) clamp(3rem, 8vw, 5.5rem);
+}
+
+.hero__inner {
+	display: grid;
+	gap: clamp(2.5rem, 6vw, 4rem);
+}
+
+.hero__titre {
+	margin: 0;
+	font-size: clamp(2.75rem, 9vw, 6rem);
+	line-height: 0.95;
+	letter-spacing: -0.025em;
+}
+
+.hero__role {
+	display: block;
+	margin-top: 0.3em;
+	color: var(--encre-doux);
+	font-size: clamp(1.25rem, 3.2vw, 2rem);
+	font-style: italic;
+	font-weight: 400;
+	letter-spacing: -0.005em;
+	line-height: 1.15;
+}
+
+.hero__intro {
+	max-width: 42ch;
+	margin: clamp(1.75rem, 3.5vw, 2.5rem) 0 0;
+}
+
+/* Fiche d'identite : la seule donnee structuree du haut de page. */
+.fiche {
+	margin: 0;
+	border-top: 1px solid var(--filet);
+	font-family: var(--mono);
+	font-size: 0.8125rem;
+	line-height: 1.5;
+}
+
+.fiche__ligne {
+	display: flex;
+	gap: 1rem;
+	justify-content: space-between;
+	padding: 0.7rem 0;
+	border-bottom: 1px solid var(--filet);
+}
+
+.fiche dt {
+	color: var(--encre-doux);
+	font-size: 0.6875rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	line-height: 1.9;
+}
+
+.fiche dd {
+	margin: 0;
+	text-align: right;
+}
+
+@media (min-width: 62em) {
+	.hero__inner {
+		grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+		align-items: end;
+	}
+}
+
+/* ==========================================================================
+   7. Bloc projet
+   ========================================================================== */
+
+.projets {
+	display: grid;
+	gap: clamp(3rem, 7vw, 5.5rem);
+}
+
+.projet {
+	display: grid;
+	gap: clamp(1.25rem, 3vw, 2rem);
+	padding-top: clamp(1.5rem, 3vw, 2rem);
+	border-top: 1px solid var(--filet);
+}
+
+.projet__num {
+	margin: 0 0 0.75rem;
+	color: var(--decor);
+	font-family: var(--mono);
+	font-size: clamp(1.75rem, 4vw, 2.75rem);
+	font-weight: 500;
+	line-height: 1;
+}
+
+.projet__contexte {
+	margin: 0 0 1.25rem;
+	color: var(--encre-doux);
+	font-family: var(--mono);
+	font-size: 0.8125rem;
+	line-height: 1.65;
+}
+
+.techs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.375rem;
+	margin: clamp(1.25rem, 2.5vw, 1.5rem) 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.tech a {
+	display: block;
+	padding: 0.4rem 0.55rem;
+	border: 1px solid var(--filet);
+	color: var(--encre-doux);
+	font-family: var(--mono);
+	font-size: 0.6875rem;
+	letter-spacing: 0.07em;
+	text-decoration: none;
+	text-transform: uppercase;
+}
+
+.tech a:hover {
+	border-color: var(--encre);
+	color: var(--encre);
+}
+
+.projet__titre {
+	margin: 0 0 clamp(1.25rem, 2.5vw, 1.75rem);
+	font-size: clamp(1.75rem, 4.5vw, 3.25rem);
+	line-height: 1.02;
+	letter-spacing: -0.02em;
+}
+
+.projet__titre a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.projet__titre a:hover {
+	text-decoration: underline;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 0.08em;
+}
+
+.projet__visuel {
+	margin: 0 0 clamp(1.25rem, 2.5vw, 1.75rem);
+	border: 1px solid var(--filet);
+}
+
+.projet__visuel img {
+	display: block;
+	width: 100%;
+}
+
+.projet__texte {
+	max-width: 58ch;
+}
+
+.projet__texte p {
+	margin: 0 0 1em;
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem 1.75rem;
+	margin: clamp(1.25rem, 2.5vw, 1.75rem) 0 0;
+}
+
+.actions a,
+.fiche-projet__retour a {
+	font-family: var(--mono);
+	font-size: 0.8125rem;
+	font-weight: 500;
+	letter-spacing: 0.07em;
+	text-transform: uppercase;
+}
+
+
+
+
+/* Bloc court : reserve aux projets de moindre ampleur.
+   La mise en page reflete le poids reel du projet. */
+.projet--compact .projet__titre {
+	margin-bottom: 1rem;
+	font-size: clamp(1.35rem, 2.8vw, 2rem);
+}
+
+.projet--compact .projet__num {
+	font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+}
+
+@media (min-width: 62em) {
+	/* Colonne etroite de metadonnees, a la maniere d'une note marginale. */
+	.projet {
+		grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+		gap: clamp(2rem, 4vw, 3.5rem);
+	}
+
+	/* Un bloc sur deux inverse la grille : le rythme evite l'effet liste. */
+	.projet--alt {
+		grid-template-columns: minmax(0, 9fr) minmax(0, 3fr);
+	}
+
+	.projet--alt .projet__meta {
+		order: 2;
+	}
+}
+
+/* ==========================================================================
+   8. Parcours
+   ========================================================================== */
+
+.parcours {
+	display: grid;
+	gap: clamp(2rem, 5vw, 3.5rem);
+}
+
+.parcours__diplome {
+	margin: 0 0 0.5rem;
+	font-size: clamp(1.5rem, 3.2vw, 2.25rem);
+	line-height: 1.1;
+}
+
+.parcours__source {
+	margin: 0 0 1.25rem;
+	color: var(--encre-doux);
+}
+
+.parcours__rncp {
+	margin: 0;
+	padding-left: 1rem;
+	border-left: 2px solid var(--filet);
+	color: var(--encre-doux);
+	font-family: var(--mono);
+	font-size: 0.8125rem;
+	line-height: 1.7;
+}
+
+.blocs {
+	margin: 0;
+	padding: 0;
+	border-top: 1px solid var(--filet);
+	list-style: none;
+}
+
+.bloc {
+	display: grid;
+	gap: 0.3rem 1rem;
+	padding: 1.25rem 0;
+	border-bottom: 1px solid var(--filet);
+}
+
+.bloc__code {
+	margin: 0;
+	font-family: var(--mono);
+	font-size: 0.8125rem;
+	font-weight: 500;
+	letter-spacing: 0.06em;
+}
+
+.bloc__intitule {
+	margin: 0;
+	font-weight: 500;
+	line-height: 1.45;
+}
+
+.bloc__preuve {
+	margin: 0;
+	color: var(--encre-doux);
+	font-size: 0.9375rem;
+	line-height: 1.55;
+}
+
+@media (min-width: 40em) {
+	.bloc {
+		grid-template-columns: 4.5rem minmax(0, 1fr);
+	}
+
+	.bloc__code {
+		grid-row: span 2;
+		padding-top: 0.15rem;
+	}
+}
+
+@media (min-width: 62em) {
+	.parcours {
+		grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+	}
+}
+
+/* ==========================================================================
+   9. Competences
+   ========================================================================== */
+
+.competences {
+	display: grid;
+	margin: 0;
+	padding: 0;
+	border-top: 1px solid var(--filet);
+	list-style: none;
+}
+
+.competence a {
+	display: flex;
+	gap: 1rem;
+	align-items: baseline;
+	justify-content: space-between;
+	padding: 0.9rem 0;
+	border-bottom: 1px solid var(--filet);
+	color: inherit;
+	text-decoration: none;
+}
+
+.competence__compte {
+	color: var(--encre-doux);
+	font-family: var(--mono);
+	font-size: 0.75rem;
+	white-space: nowrap;
+}
+
+.competence a:hover .competence__nom {
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
+}
+
+@media (min-width: 48em) {
+	.competences {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		column-gap: clamp(2rem, 5vw, 4rem);
+	}
+}
+
+/* ==========================================================================
+   10. Ce site
+   ========================================================================== */
+
+.cesite {
+	display: grid;
+	gap: clamp(1.5rem, 4vw, 3rem);
+}
+
+.cesite__chapo {
+	max-width: 30ch;
+	margin: 0;
+	font-size: clamp(1.125rem, 2.2vw, 1.5rem);
+	line-height: 1.35;
+}
+
+.cesite__liste {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	font-family: var(--mono);
+	font-size: 0.8125rem;
+	line-height: 1.6;
+}
+
+.cesite__liste li {
+	padding: 0.8rem 0;
+	border-bottom: 1px solid var(--filet);
+}
+
+.cesite__liste li:first-child {
+	border-top: 1px solid var(--filet);
+}
+
+@media (min-width: 62em) {
+	.cesite {
+		grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+	}
+}
+
+/* ==========================================================================
+   11. Fiche projet (page dediee)
+   ========================================================================== */
+
+.fiche-projet__entete {
+	padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(1.75rem, 4vw, 3rem);
+}
+
+.fiche-projet__grille {
+	display: grid;
+	gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.fiche-projet__retour {
+	margin: 0 0 1.25rem;
+}
+
+.fiche-projet__titre {
+	margin: 0;
+	font-size: clamp(2.25rem, 6vw, 4.5rem);
+	line-height: 0.98;
+	letter-spacing: -0.025em;
+}
+
+.fiche-projet__visuel {
+	margin: 0 0 clamp(2rem, 5vw, 3.5rem);
+}
+
+.fiche-projet__visuel img {
+	display: block;
+	width: 100%;
+	border: 1px solid var(--filet);
+}
+
+/* Grille de visuels du projet. Une colonne sur mobile, deux au-dela, la
+   seconde decalee vers le bas : la grille respire au lieu de former deux
+   rangees alignees. Les captures sont montrees entieres, jamais recadrees :
+   ce sont des interfaces, le contenu est l'information. */
+.visuels {
+	display: grid;
+	gap: clamp(1rem, 2.5vw, 2rem);
+}
+
+.visuels__carte {
+	margin: 0;
+}
+
+@media (min-width: 48em) {
+	.visuels {
+		grid-template-columns: 1fr 1fr;
+		align-items: start;
+	}
+
+	.visuels__carte:nth-child(even) {
+		margin-top: clamp(2rem, 6vw, 4.5rem);
+	}
+}
+
+@media (min-width: 62em) {
+	.fiche-projet__grille {
+		grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+	}
+}
+
+.pagination-projets {
+	margin-top: clamp(3rem, 7vw, 5rem);
+	border-top: 1px solid var(--filet);
+}
+
+.pagination-projets__inner {
+	display: grid;
+}
+
+.pagination-projets__lien {
+	display: block;
+	padding: clamp(1.5rem, 3vw, 2.25rem) 0;
+	border-bottom: 1px solid var(--filet);
+	color: inherit;
+	text-decoration: none;
+}
+
+.pagination-projets__titre {
+	display: block;
+	margin-top: 0.4rem;
+	font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+	line-height: 1.15;
+}
+
+.pagination-projets__lien:hover .pagination-projets__titre {
+	text-decoration: underline;
+	text-underline-offset: 0.15em;
+}
+
+.pagination-projets .etiquette {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+@media (min-width: 48em) {
+	.pagination-projets__inner {
+		grid-template-columns: 1fr 1fr;
+		column-gap: clamp(2rem, 5vw, 4rem);
+	}
+
+	.pagination-projets__lien--suivant {
+		text-align: right;
+	}
+
+	.pagination-projets__lien:only-child {
+		grid-column: 1;
+	}
+}
+
+/* ==========================================================================
+   12. Contenu redige dans l'editeur
+   ========================================================================== */
+
+.prose {
+	max-width: 64ch;
+}
+
+.prose > * + * {
+	margin-top: 1.3em;
+}
+
+.prose h2 {
+	margin-top: 2em;
+	font-size: clamp(1.5rem, 3vw, 2rem);
+	line-height: 1.15;
+}
+
+.prose h3 {
+	margin-top: 1.75em;
+	font-size: 1.25rem;
+	line-height: 1.25;
+}
+
+.prose ul,
+.prose ol {
+	padding-left: 1.25rem;
+}
+
+.prose li + li {
+	margin-top: 0.4em;
+}
+
+.prose img {
+	display: block;
+	border: 1px solid var(--filet);
+}
+
+.prose figcaption {
+	margin-top: 0.5rem;
+	color: var(--encre-doux);
+	font-family: var(--mono);
+	font-size: 0.75rem;
+}
+
+.prose blockquote {
+	margin-left: 0;
+	padding-left: 1.25rem;
+	border-left: 2px solid var(--filet);
+	color: var(--encre-doux);
+	font-style: italic;
+}
+
+.prose code {
+	padding: 0.15em 0.35em;
+	background: var(--papier-alt);
+	font-family: var(--mono);
+	font-size: 0.9em;
+}
+
+.prose pre {
+	padding: 1.25rem;
+	overflow-x: auto;
+	background: var(--encre);
+	color: var(--papier);
+	font-family: var(--mono);
+	font-size: 0.8125rem;
+	line-height: 1.6;
+}
+
+.prose pre code {
+	padding: 0;
+	background: none;
+}
+
+.prose table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.9375rem;
+}
+
+.prose th,
+.prose td {
+	padding: 0.6rem 0.75rem 0.6rem 0;
+	border-bottom: 1px solid var(--filet);
+	text-align: left;
+	vertical-align: top;
+}
+
+/* ==========================================================================
+   13. Archives, 404, pagination
+   ========================================================================== */
+
+.archive__titre {
+	margin: 0 0 clamp(1.5rem, 3vw, 2.5rem);
+	font-size: clamp(2rem, 5.5vw, 3.5rem);
+	line-height: 1.02;
+}
+
+.archive__titre a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.erreur__code {
+	margin: 0 0 0.5rem;
+	color: var(--decor);
+	font-family: var(--mono);
+	font-size: clamp(3.5rem, 13vw, 8rem);
+	font-weight: 500;
+	line-height: 1;
+}
+
+.navigation.pagination {
+	margin-top: clamp(2.5rem, 5vw, 4rem);
+	padding-top: 1.5rem;
+	border-top: 1px solid var(--filet);
+	font-family: var(--mono);
+	font-size: 0.8125rem;
+}
+
+.navigation.pagination .nav-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+}
+
+.navigation.pagination .current {
+	color: var(--encre-doux);
+}
+
+/* ==========================================================================
+   14. Pied de page
+   ========================================================================== */
+
+.pied {
+	padding-block: clamp(3.5rem, 8vw, 6rem);
+	background: var(--encre);
+	color: var(--papier);
+}
+
+.pied .etiquette {
+	border-color: rgba(242, 239, 233, 0.22);
+	color: rgba(242, 239, 233, 0.62);
+}
+
+.pied a {
+	color: var(--papier);
+	text-decoration-color: rgba(242, 239, 233, 0.45);
+}
+
+.pied a:hover {
+	color: var(--accent-inverse);
+	text-decoration-color: currentColor;
+}
+
+.pied :focus-visible {
+	outline-color: var(--accent-inverse);
+}
+
+.pied__grille {
+	display: grid;
+	gap: clamp(1.75rem, 4vw, 3rem);
+}
+
+.pied__phrase {
+	max-width: 24ch;
+	margin: 0;
+	font-size: clamp(1.25rem, 2.6vw, 1.75rem);
+	line-height: 1.3;
+}
+
+.pied__liens {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	font-family: var(--mono);
+	font-size: 0.8125rem;
+	overflow-wrap: anywhere;
+}
+
+.pied__liens li {
+	padding: 0.7rem 0;
+	border-bottom: 1px solid rgba(242, 239, 233, 0.22);
+}
+
+.pied__liens li:first-child {
+	border-top: 1px solid rgba(242, 239, 233, 0.22);
+}
+
+.pied__legal {
+	margin: clamp(2.5rem, 6vw, 4rem) 0 0;
+	color: rgba(242, 239, 233, 0.7);
+	font-family: var(--mono);
+	font-size: 0.75rem;
+	line-height: 1.8;
+}
+
+.pied__legal + .pied__legal {
+	margin-top: 0.3rem;
+}
+
+.pied__legal-lien {
+	margin-left: 1.75rem;
+}
+
+@media (min-width: 62em) {
+	.pied__grille {
+		grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+		gap: clamp(3rem, 8vw, 6rem);
+	}
+}
+
+/* ==========================================================================
+   16. Traitement des visuels, transitions de page, apparition au defilement
+   Tout est natif : aucune de ces trois sections n'ajoute de JavaScript.
+   ========================================================================== */
+
+/* Les trois captures viennent d'univers graphiques sans rapport : bleu spatial,
+   bleu vif, rouge et rose. Un monochrome chaud les ramene dans la palette de la
+   page. Le survol, ou le focus du titre, rend la couleur d'origine : c'est une
+   information reelle, pas un effet decoratif.
+   La page dediee d'un projet, elle, affiche toujours la vraie capture. */
+.projet__visuel img {
+	filter: grayscale(1) sepia(0.28) contrast(1.04);
+	transition: filter 0.35s ease;
+}
+
+.projet:hover .projet__visuel img,
+.projet:focus-within .projet__visuel img {
+	filter: none;
+}
+
+/* Transition entre pages. Le visuel et le titre portent un nom partage
+   (genere en PHP a partir de l'identifiant du projet) : ils se deplacent
+   d'une page a l'autre au lieu de disparaitre. Les navigateurs sans
+   View Transitions naviguent normalement. */
+@view-transition {
+	navigation: auto;
+}
+
+::view-transition-group(*) {
+	animation-duration: 0.32s;
+}
+
+/* Apparition au defilement, uniquement sur les blocs projets.
+   Sans prise en charge, ou si l'utilisateur reduit les animations,
+   les blocs sont simplement affiches. */
+@media (prefers-reduced-motion: no-preference) {
+	@supports (animation-timeline: view()) {
+		.projet {
+			animation: nv-apparition linear both;
+			animation-timeline: view();
+			animation-range: entry 0% entry 55%;
+		}
+	}
+}
+
+/* Parallaxe de la grille de visuels. Les deux colonnes derivent en sens
+   inverse au rythme du defilement : la profondeur vient du decalage entre
+   elles, pas d'un mouvement propre a chaque image.
+   Uniquement a partir de deux colonnes : en colonne unique les cartes se
+   rapprocheraient jusqu'a se toucher. Sans prise en charge des animations
+   liees au defilement, ou si l'utilisateur reduit les animations, la grille
+   est simplement immobile. */
+@media (prefers-reduced-motion: no-preference) and (min-width: 48em) {
+	@supports (animation-timeline: view()) {
+		.visuels__carte {
+			animation: nv-parallaxe linear both;
+			animation-timeline: view();
+			animation-range: cover;
+		}
+
+		.visuels__carte:nth-child(even) {
+			animation-direction: reverse;
+		}
+	}
+}
+
+@keyframes nv-parallaxe {
+	from {
+		transform: translateY(2.75rem);
+	}
+
+	to {
+		transform: translateY(-2.75rem);
+	}
+}
+
+@keyframes nv-apparition {
+	from {
+		opacity: 0;
+		transform: translateY(1.25rem);
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+/* ==========================================================================
+   15. Preferences d'affichage
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+
+	*,
+	*::before,
+	*::after {
+		transition-duration: 0.01ms !important;
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+	}
+
+	::view-transition-group(*),
+	::view-transition-old(*),
+	::view-transition-new(*) {
+		animation: none !important;
+	}
+}
+
+/* A l'impression il n'y a pas de defilement : sans cette regle, les blocs
+   qui n'ont pas encore ete atteints a l'ecran sortent invisibles sur le
+   papier et dans les exports PDF. */
+@media print {
+	.projet {
+		animation: none !important;
+		opacity: 1 !important;
+		transform: none !important;
+	}
+
+	.projet__visuel img {
+		filter: none;
+	}
+}
+
+@media (forced-colors: active) {
+	.tech a,
+	.projet__visuel,
+	.fiche-projet__visuel img {
+		border: 1px solid;
+	}
+}
