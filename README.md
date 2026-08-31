@@ -91,8 +91,3 @@ si un projet n'a pas de démonstration en ligne.
 
 Aucun projet publié, aucun projet pour une technologie, lien de code ou de
 démonstration absent, image mise en avant absente, contenu long, 404.
-
-## À faire
-
-- [x] `screenshot.png` (1200 × 900) à la racine du thème, pour l'écran Apparence.
-- [ ] Renseigner l'hébergeur dans la page Mentions légales.
