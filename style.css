@@ -467,7 +467,10 @@ a:hover {
 }
 
 .projet--compact .projet__num {
-	font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+	/* Plancher a 1.5rem : en dessous de 24px, --decor (3.4:1) sort du seuil
+	   WCAG du grand texte et le numero devient une violation de contraste sur
+	   mobile, ou le clamp retombait a 1.25rem. */
+	font-size: clamp(1.5rem, 2.5vw, 1.75rem);
 }
 
 @media (min-width: 62em) {
