@@ -82,5 +82,5 @@ démonstration absent, image mise en avant absente, contenu long, 404.
 
 ## À faire
 
-- [ ] `screenshot.png` (1200 × 900) à la racine du thème, pour l'écran Apparence.
+- [x] `screenshot.png` (1200 × 900) à la racine du thème, pour l'écran Apparence.
 - [ ] Renseigner l'hébergeur dans la page Mentions légales.
