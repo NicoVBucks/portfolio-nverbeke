@@ -145,3 +145,117 @@ function nv_liens_projet( $post_id ) {
 		echo '<p class="actions">' . $sortie . '</p>'; // phpcs:ignore WordPress.Security.EscapeOutput -- contenu deja echappe ci-dessus.
 	}
 }
+
+/**
+ * Description de la page courante, pour la meta description et Open Graph.
+ *
+ * WordPress ne genere aucune meta description nativement : sans elle, un
+ * moteur de recherche fabrique lui-meme un extrait dans la page.
+ *
+ * @return string Description en texte brut, tronquee a 160 caracteres.
+ */
+function nv_description_page() {
+	if ( is_singular() ) {
+		$texte = get_the_excerpt();
+	} elseif ( is_tax( 'technologie' ) ) {
+		$terme = get_queried_object();
+		/* translators: %s : nom d'une technologie. */
+		$texte = sprintf( __( 'Projets réalisés avec %s.', 'nverbeke' ), $terme->name );
+	} elseif ( is_post_type_archive( 'projet' ) ) {
+		$texte = __( 'Les projets de Nicolas Verbeke, développeur web.', 'nverbeke' );
+	} else {
+		// Le slogan se renseigne dans Reglages > General. Sans lui, ce repli.
+		$texte = get_bloginfo( 'description' );
+
+		if ( ! $texte ) {
+			$texte = __( 'Portfolio de Nicolas Verbeke, développeur web : thèmes WordPress sur-mesure, intégration HTML et CSS, JavaScript sans framework.', 'nverbeke' );
+		}
+	}
+
+	return wp_html_excerpt( wp_strip_all_tags( $texte ), 160, '…' );
+}
+
+/**
+ * Meta description, Open Graph et carte Twitter.
+ *
+ * Sans ces balises, un lien vers le site partage sur LinkedIn ou dans une
+ * messagerie s'affiche nu : ni titre, ni resume, ni visuel.
+ */
+function nv_meta_sociales() {
+	$description = nv_description_page();
+
+	if ( is_singular() ) {
+		$url   = get_permalink();
+		$titre = get_the_title();
+		$type  = 'article';
+	} elseif ( is_tax( 'technologie' ) ) {
+		$terme = get_queried_object();
+		$url   = get_term_link( $terme );
+		$titre = $terme->name;
+		$type  = 'website';
+	} elseif ( is_post_type_archive( 'projet' ) ) {
+		$url   = get_post_type_archive_link( 'projet' );
+		$titre = post_type_archive_title( '', false );
+		$type  = 'website';
+	} else {
+		$url   = home_url( '/' );
+		$titre = get_bloginfo( 'name' );
+		$type  = 'website';
+	}
+
+	// L'image a la une du contenu, sinon le visuel de partage du theme.
+	$image = is_singular() && has_post_thumbnail()
+		? get_the_post_thumbnail_url( null, 'nv_projet' )
+		: get_template_directory_uri() . '/assets/og-image.png';
+
+	$balises = array(
+		'name'     => array(
+			'description'  => $description,
+			'twitter:card' => 'summary_large_image',
+		),
+		'property' => array(
+			'og:type'        => $type,
+			'og:site_name'   => get_bloginfo( 'name' ),
+			'og:locale'      => get_locale(),
+			'og:title'       => $titre,
+			'og:description' => $description,
+			'og:url'         => $url,
+			'og:image'       => $image,
+		),
+	);
+
+	foreach ( $balises as $attribut => $paires ) {
+		foreach ( $paires as $cle => $valeur ) {
+			if ( ! $valeur ) {
+				continue;
+			}
+
+			printf(
+				'<meta %s="%s" content="%s">' . "\n",
+				esc_attr( $attribut ),
+				esc_attr( $cle ),
+				esc_attr( $valeur )
+			);
+		}
+	}
+}
+add_action( 'wp_head', 'nv_meta_sociales', 2 );
+
+/**
+ * Icone du site, en repli.
+ *
+ * Si une icone est definie dans Reglages > General, WordPress emet deja ses
+ * propres balises et on ne fait rien : deux jeux de declarations se
+ * contrediraient.
+ */
+function nv_favicon() {
+	if ( has_site_icon() ) {
+		return;
+	}
+
+	$icone = esc_url( get_template_directory_uri() . '/assets/favicon.png' );
+
+	printf( '<link rel="icon" href="%s" sizes="any">' . "\n", $icone );
+	printf( '<link rel="apple-touch-icon" href="%s">' . "\n", $icone );
+}
+add_action( 'wp_head', 'nv_favicon', 2 );

@@ -59,6 +59,18 @@ Trois fichiers woff2, subset latin, environ 95 Ko. Aucune requête vers
 Google Fonts : pas de transfert d'adresse IP vers un tiers, et une
 requête réseau de moins. La police des titres est préchargée.
 
+**Métadonnées sociales écrites dans le thème, sans extension SEO.**
+WordPress ne génère ni meta description ni Open Graph. Sans elles, un lien
+partagé sur LinkedIn s'affiche sans titre, sans résumé et sans visuel.
+`nv_meta_sociales()` les produit à partir du contenu réel : extrait de la
+fiche pour un projet, nom de la technologie pour une archive de taxonomie,
+slogan du site pour l'accueil. L'image de partage est l'image mise en avant
+quand elle existe, sinon `assets/og-image.png`.
+
+**Icône du site en repli.**
+`nv_favicon()` ne fait rien si une icône est définie dans Réglages, pour ne
+pas contredire les balises que WordPress émet alors lui-même.
+
 **Un lien vide n'affiche pas de bouton.**
 `nv_liens_projet()` saute les champs non renseignés : pas de bouton inerte
 si un projet n'a pas de démonstration en ligne.
