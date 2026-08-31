@@ -40,7 +40,10 @@ function nv_register_cpt_projet() {
 			'rewrite'       => array( 'slug' => 'projets', 'with_front' => false ),
 			'menu_icon'     => 'dashicons-portfolio',
 			'menu_position' => 5,
-			'supports'      => array( 'title', 'editor', 'thumbnail', 'page-attributes' ),
+			// 'excerpt' : sans lui, les listes tronquent la description a 55 mots,
+			// en plein milieu d'une phrase. Le champ permet d'ecrire le resume
+			// affiche sur l'accueil et l'archive sans raccourcir la fiche.
+			'supports'      => array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes' ),
 			'show_in_rest'  => true,
 			'hierarchical'  => false,
 		)
